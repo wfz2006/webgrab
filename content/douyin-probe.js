@@ -96,24 +96,40 @@
     return null;
   }
 
-  function detailFromPayload(payload) {
-    const direct = payload?.aweme_detail
-      || payload?.aweme_details?.[0]
-      || payload?.data?.aweme_detail;
-    if (direct) return direct;
+  /**
+   * 已见过但还不知道用户会不会点开的作品：aweme_id → detail。
+   *
+   * 真机实测（2026-08-04，登录态）测得的关键时序：`module/feed` 在页面初始加载时
+   * 就一次性把整屏信息流（约 10 条，含各自完整的播放地址）取回来了，响应到达时
+   * URL 上还没有 `modal_id`；用户过了几十秒才点开其中一条，此时页面只是
+   * `history.replaceState` 补上 `modal_id`，**不会再发任何请求**。
+   *
+   * 所以不能在响应到达那一刻"要么匹配要么丢弃"——那时根本还不知道用户要看哪条。
+   * 正确做法是先缓存，等 `modal_id` 指向其中某条时再发布那一条。
+   */
+  const MAX_CACHED_DETAILS = 200;
+  const cachedDetails = new Map();
 
-    if (Array.isArray(payload?.aweme_list) && payload.aweme_list.length > 0) {
-      const modalId = currentModalAwemeId();
-      if (!modalId) return null; // 没有明确的“当前视频”标识，宁可不报也不猜。
-      return payload.aweme_list.find((item) => String(item?.aweme_id || '') === modalId) || null;
+  function cacheDetail(detail) {
+    const id = String(detail?.aweme_id || detail?.awemeId || '');
+    if (!id || !detail?.video || cachedDetails.has(id)) return;
+    cachedDetails.set(id, detail);
+    // 无限滚动会不断追加，按插入序丢最早的，避免长时间停留把内存撑大。
+    while (cachedDetails.size > MAX_CACHED_DETAILS) {
+      cachedDetails.delete(cachedDetails.keys().next().value);
     }
-
-    return null;
   }
 
-  function reportPayload(payload) {
+  /** URL 上的 modal_id 指向哪条，就发布哪条；没有指向或没缓存到就什么都不做。 */
+  function publishCurrentModal() {
+    const modalId = currentModalAwemeId();
+    if (!modalId || parsedMediaIds.has(modalId)) return;
+    const detail = cachedDetails.get(modalId);
+    if (detail) publishDetail(detail);
+  }
+
+  function publishDetail(detail) {
     try {
-      const detail = detailFromPayload(payload);
       const video = detail?.video;
       if (!detail || !video) return;
 
@@ -150,6 +166,57 @@
       // 页面数据变化不能影响站点自身执行。
     }
   }
+
+  function reportPayload(payload) {
+    try {
+      // aweme/detail 这类单条接口是明确的"就是这一条"（分享链接、作品页等入口），
+      // 不依赖 modal_id，直接发布。
+      const direct = payload?.aweme_detail
+        || payload?.aweme_details?.[0]
+        || payload?.data?.aweme_detail;
+      if (direct) {
+        publishDetail(direct);
+        return;
+      }
+
+      if (Array.isArray(payload?.aweme_list) && payload.aweme_list.length > 0) {
+        for (const item of payload.aweme_list) cacheDetail(item);
+        // modal_id 可能已经在 URL 上（例如直接带 modal_id 打开页面），先试一次。
+        publishCurrentModal();
+      }
+    } catch {
+      // 页面数据变化不能影响站点自身执行。
+    }
+  }
+
+  /**
+   * 监听 URL 变化，好在用户点开某条时把缓存里对应的那条发布出去。
+   * 抖音是用 history.replaceState 补 modal_id 的（实测），因此必须包装
+   * pushState/replaceState —— 只听 popstate 收不到这类程序化跳转。
+   * 这里是链式包装（先调原函数再做自己的事），不改变站点自身行为。
+   */
+  function watchLocationChanges() {
+    const fire = () => {
+      try { publishCurrentModal(); } catch { /* 不能影响站点导航 */ }
+    };
+    try {
+      window.addEventListener?.('popstate', fire);
+      window.addEventListener?.('hashchange', fire);
+    } catch { /* 环境不支持则跳过 */ }
+    try {
+      const history = window.history;
+      for (const name of ['pushState', 'replaceState']) {
+        const original = history?.[name];
+        if (typeof original !== 'function') continue;
+        history[name] = function () {
+          const result = original.apply(this, arguments);
+          fire();
+          return result;
+        };
+      }
+    } catch { /* history 不可写则跳过 */ }
+  }
+  watchLocationChanges();
 
   function inspectFetchResponse(response) {
     try {

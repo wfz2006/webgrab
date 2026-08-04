@@ -75,6 +75,7 @@ function createProbeContext() {
     },
     url: String(input),
   });
+  const listeners = new Map();
   const context = {
     URL,
     Promise,
@@ -84,6 +85,12 @@ function createProbeContext() {
     postMessage(message) { messages.push(structuredClone(message)); },
     setTimeout,
     clearTimeout,
+    addEventListener(type, handler) {
+      if (!listeners.has(type)) listeners.set(type, []);
+      listeners.get(type).push(handler);
+    },
+    // 抖音是用 history.replaceState 把 modal_id 补进 URL 的（真机实测）
+    history: { pushState() {}, replaceState() {} },
   };
   context.window = context;
   context.globalThis = context;
@@ -91,6 +98,12 @@ function createProbeContext() {
     context,
     messages,
     setDetailResponse(value) { detailResponse = value; },
+    /** 模拟用户点开某条视频：页面改 URL 并 replaceState */
+    openModal(awemeId) {
+      const base = context.location.href.split('?')[0];
+      context.location.href = awemeId ? `${base}?modal_id=${awemeId}` : base;
+      context.history.replaceState(null, '', context.location.href);
+    },
   };
 }
 
@@ -227,4 +240,106 @@ test('manifest 与恢复注入表声明抖音探针，且 bridge 接受通用结
   const bridge = fs.readFileSync(path.join(root, 'content', 'bridge.js'), 'utf8');
   assert.match(bridge, /case\s+['"]resource['"]/);
   assert.match(bridge, /isPrimaryMedia:\s*data\.isPrimaryMedia\s*===\s*true/);
+});
+
+test('真机实测时序：首屏 module/feed 到达时 URL 上还没有 modal_id，用户之后点开某条时才把缓存里对应的那条发布出去', async () => {
+  const source = fs.readFileSync(probePath, 'utf8');
+  const { context, messages, setDetailResponse, openModal } = createProbeContext();
+  vm.runInNewContext(source, context, { filename: probePath });
+
+  // 页面初始加载：一次性取回整屏信息流，此时用户还没点任何东西。
+  setDetailResponse(feedFixture([
+    { id: '7000000000000000001', desc: '首屏第一条' },
+    { id: '7664340755343007650', desc: '用户稍后点开的这条' },
+    { id: '7000000000000000002', desc: '首屏第三条' },
+  ]));
+  context.location.href = 'https://www.douyin.com/jingxuan';
+
+  await context.fetch('https://www.douyin.com/aweme/v2/web/module/feed/?module_id=3003101');
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  assert.equal(
+    messages.filter((m) => m.type === 'resource').length,
+    0,
+    '还不知道用户要看哪条，此时不能报任何资源'
+  );
+
+  // 几十秒后用户点开其中一条：抖音不再发请求，只用 replaceState 补上 modal_id。
+  openModal('7664340755343007650');
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  const media = messages.filter((m) => m.type === 'resource');
+  assert.equal(media.length, 1, '点开后必须把缓存里对应的那条发布出去');
+  assert.equal(media[0].data.mediaId, '7664340755343007650');
+  assert.equal(media[0].data.title, '用户稍后点开的这条.mp4');
+  assert.equal(media[0].data.url, 'https://v3-dy.douyinvod.com/h264-7664340755343007650.mp4');
+  assert.equal(media[0].data.isPrimaryMedia, true);
+});
+
+test('用户点开的作品不在缓存里时不产出资源，也不影响之后点开缓存中的作品', async () => {
+  const source = fs.readFileSync(probePath, 'utf8');
+  const { context, messages, setDetailResponse, openModal } = createProbeContext();
+  vm.runInNewContext(source, context, { filename: probePath });
+
+  setDetailResponse(feedFixture([{ id: '7000000000000000001', desc: '缓存里的唯一一条' }]));
+  context.location.href = 'https://www.douyin.com/jingxuan';
+  await context.fetch('https://www.douyin.com/aweme/v2/web/module/feed/?module_id=3003101');
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  openModal('9999999999999999999'); // 缓存里没有
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(messages.filter((m) => m.type === 'resource').length, 0);
+
+  openModal('7000000000000000001'); // 缓存里有
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const media = messages.filter((m) => m.type === 'resource');
+  assert.equal(media.length, 1);
+  assert.equal(media[0].data.mediaId, '7000000000000000001');
+});
+
+test('在同一条作品上反复触发 URL 变化只发布一次', async () => {
+  const source = fs.readFileSync(probePath, 'utf8');
+  const { context, messages, setDetailResponse, openModal } = createProbeContext();
+  vm.runInNewContext(source, context, { filename: probePath });
+
+  setDetailResponse(feedFixture([{ id: '7000000000000000001' }]));
+  context.location.href = 'https://www.douyin.com/jingxuan';
+  await context.fetch('https://www.douyin.com/aweme/v2/web/module/feed/?module_id=3003101');
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  openModal('7000000000000000001');
+  openModal('7000000000000000001');
+  openModal('7000000000000000001');
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  assert.equal(messages.filter((m) => m.type === 'resource').length, 1);
+});
+
+test('缓存有上限，无限滚动持续追加时不会无界增长（最早的条目被丢弃）', async () => {
+  const source = fs.readFileSync(probePath, 'utf8');
+  const { context, messages, setDetailResponse, openModal } = createProbeContext();
+  vm.runInNewContext(source, context, { filename: probePath });
+  context.location.href = 'https://www.douyin.com/jingxuan';
+
+  // 探针上限是 200 条；分批灌入 210 条，最早的 10 条应当已被丢弃。
+  const firstId = '7100000000000000000';
+  setDetailResponse(feedFixture([{ id: firstId, desc: '最早的一条' }]));
+  await context.fetch('https://www.douyin.com/aweme/v2/web/module/feed/?module_id=3003101');
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  for (let batch = 0; batch < 21; batch++) {
+    setDetailResponse(feedFixture(
+      Array.from({ length: 10 }, (_, i) => ({ id: `72${String(batch * 10 + i).padStart(16, '0')}` }))
+    ));
+    await context.fetch('https://www.douyin.com/aweme/v2/web/module/feed/?module_id=3003101');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+
+  openModal(firstId);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(
+    messages.filter((m) => m.type === 'resource').length,
+    0,
+    '超出上限被淘汰的旧条目不该再发布，这正是内存有界的证明'
+  );
 });
