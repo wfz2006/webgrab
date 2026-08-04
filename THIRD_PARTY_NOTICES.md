@@ -1,5 +1,10 @@
 # Third-party notices
 
+> WebGrab 自身的源代码采用 MIT License（见 [LICENSE](LICENSE)）。
+> **本文件列出的第三方组件各自保留其原有许可证，不受 MIT 声明影响。**
+> `LICENSE` 文件保持标准 MIT 原文不做增删，以便 GitHub 等工具正确识别；
+> 适用范围的说明放在这里和 README。
+
 ## Mozilla Readability
 
 WebGrab bundles the standalone Mozilla Readability library locally for its

@@ -19,16 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-SCOPE / 适用范围
-
-This license covers WebGrab's own source code only.
-
-The repository also vendors third-party components under `lib/`, which remain
-under their own respective licenses and are NOT relicensed by this file. See
-THIRD_PARTY_NOTICES.md for the per-component details.
-
-本许可证仅适用于 WebGrab 自身的源代码。仓库中 `lib/` 下打包的第三方组件各自
-保留其原有许可证，不受本文件影响，逐项说明见 THIRD_PARTY_NOTICES.md。
