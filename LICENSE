@@ -1,0 +1,34 @@
+MIT License
+
+Copyright (c) 2026 wfz2006
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+SCOPE / 适用范围
+
+This license covers WebGrab's own source code only.
+
+The repository also vendors third-party components under `lib/`, which remain
+under their own respective licenses and are NOT relicensed by this file. See
+THIRD_PARTY_NOTICES.md for the per-component details.
+
+本许可证仅适用于 WebGrab 自身的源代码。仓库中 `lib/` 下打包的第三方组件各自
+保留其原有许可证，不受本文件影响，逐项说明见 THIRD_PARTY_NOTICES.md。

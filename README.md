@@ -31,7 +31,22 @@ CBZ / EPUB ZIP 使用本地打包的 fflate 0.8.3（MIT）：
 - 固定文件：`lib/fflate.min.js`
 - 完整声明、SHA-256 和许可证副本见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
 
+流媒体清单解析使用本地打包的 m3u8-parser 7.2.0 与 mpd-parser 1.3.0（均为 Apache-2.0，
+文件头自带声明）；MP4 解析/重封装使用 mp4box.js；兜底转码使用 FFmpeg.wasm
+（`lib/ffmpeg/`，含 30MB 的 `ffmpeg-core.wasm`）。
+
+⚠️ mp4box.js 与 FFmpeg.wasm 的打包文件内没有内嵌许可证头，其许可证**尚待回上游核对**；
+FFmpeg 本体属于 LGPL v2.1 或 GPL（取决于构建配置），对分发有实际约束。详见
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
 扩展不从 CDN 或其他远程地址加载可执行代码。
+
+## 许可证
+
+WebGrab 自身的源代码采用 [MIT License](LICENSE)。
+
+`lib/` 下打包的第三方组件各自保留其原有许可证，**不受 MIT 声明影响**，逐项说明见
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ## 已打开页面的自愈扫描
 
