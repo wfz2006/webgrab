@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WebGrab</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --canvas: #0b0d10; --surface: #111419; --raised: #181c22; --line: #252b34;
+    --text: #e8eaed; --secondary: #a8b0bb; --muted: #7f8a99;
+    --accent: #4da3ff; --accent-muted: #153a61; --on-accent: #07101a;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+    --mono: "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { color-scheme: light; --canvas: #f4f6f8; --surface: #ffffff; --raised: #edf0f3; --line: #d2d8df;
+      --text: #171b21; --secondary: #3d4855; --muted: #566474; --accent: #176fc8; --accent-muted: #d9ebfd; --on-accent: #ffffff; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--canvas); color: var(--text); font-family: var(--font); }
+  .shell { width: min(640px, calc(100% - 48px)); padding: 40px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  .eyebrow { margin: 0 0 8px; color: var(--accent); font: 700 11px/1.2 var(--mono); letter-spacing: .12em; }
+  h1 { margin: 0 0 28px; font-size: 24px; letter-spacing: -.02em; }
+  .steps { display: grid; gap: 16px; margin-bottom: 32px; }
+  .step { display: flex; gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 4px; background: var(--raised); }
+  .step-num { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 999px; background: var(--accent-muted); color: var(--accent); font: 800 14px var(--mono); }
+  .step-body h2 { margin: 0 0 6px; font-size: 15px; }
+  .step-body p { margin: 0; color: var(--secondary); font-size: 13px; line-height: 1.6; }
+  .actions { display: flex; justify-content: flex-end; }
+  button { min-height: 40px; padding: 10px 20px; border: 1px solid var(--accent); border-radius: 4px; background: var(--accent); color: var(--on-accent); font: 700 13px inherit; cursor: pointer; }
+  button:hover { opacity: .85; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+  <main class="shell">
+    <p class="eyebrow">WEBGRAB</p>
+    <h1 id="onboarding-title">欢迎使用 WebGrab</h1>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-body"><h2 id="step1-title"></h2><p id="step1-body"></p></div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-body"><h2 id="step2-title"></h2><p id="step2-body"></p></div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-body"><h2 id="step3-title"></h2><p id="step3-body"></p></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" id="dismiss-btn"></button>
+    </div>
+  </main>
+  <script src="onboarding.js"></script>
+</body>
+</html>

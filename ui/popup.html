@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebGrab</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- 头部 -->
+  <header class="header">
+    <div class="header-left">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5.5h12M5.5 3v12M12.5 3v12M3 12.5h12" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9" r="6.5" stroke="currentColor"/></svg>
+        </span>
+        <span class="brand-meta">
+          <span class="logo">WebGrab</span>
+          <span class="console-label"><span class="status-signal" aria-hidden="true"></span> RESOURCE CONSOLE</span>
+        </span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button id="btn-sidepanel" class="icon-btn" title="在侧边栏中打开" aria-label="在侧边栏中打开" hidden>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="1.5" y="2.5" width="13" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M9.5 2.5v11" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+      </button>
+      <button id="btn-settings" class="icon-btn" title="下载目录与命名设置" aria-label="下载目录与命名设置">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6.7 2.1h2.6l.35 1.45c.35.14.68.33.98.56l1.42-.43 1.3 2.24-1.08 1.02c.03.35.03.72 0 1.07l1.08 1.02-1.3 2.24-1.42-.43c-.3.23-.63.42-.98.56L9.3 12.9H6.7l-.35-1.45a4.5 4.5 0 0 1-.98-.56l-1.42.43-1.3-2.24 1.08-1.02a6.2 6.2 0 0 1 0-1.07L2.65 5.97l1.3-2.24 1.42.43c.3-.23.63-.42.98-.56L6.7 2.1Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/>
+          <circle cx="8" cy="7.5" r="1.7" stroke="currentColor" stroke-width="1.1"/>
+        </svg>
+      </button>
+      <button id="btn-refresh" class="icon-btn" title="重新加载页面并重新嗅探" aria-label="重新加载页面并重新嗅探">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M14 8a6 6 0 1 1-1.76-4.24M14 2v3.5h-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button id="btn-clear" class="icon-btn" title="清空当前页">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 4h10M6 4V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1M5 4v8.5a1.5 1.5 0 0 0 1.5 1.5h3a1.5 1.5 0 0 0 1.5-1.5V4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- 视图切换 -->
+  <nav class="view-switcher">
+    <button class="view-tab active" data-view="resources">资源</button>
+    <button class="view-tab" data-view="text">文本</button>
+    <button class="view-tab view-tab-bili" data-view="bilibili" style="display:none">B站</button>
+    <button class="view-tab" data-view="tasks">
+      任务
+      <span class="view-badge" id="task-badge" style="display:none">0</span>
+    </button>
+  </nav>
+
+  <!-- 资源视图 -->
+  <div class="view-pane view-resources active" id="view-resources">
+    <!-- 类型筛选 Tab -->
+    <nav class="tabs">
+      <button class="tab active" data-kind="all">全部 <span class="count" data-count="all">0</span></button>
+      <button class="tab" data-kind="video">视频 <span class="count" data-count="video">0</span></button>
+      <button class="tab" data-kind="audio">音频 <span class="count" data-count="audio">0</span></button>
+      <button class="tab" data-kind="image">图片 <span class="count" data-count="image">0</span></button>
+      <button class="tab" data-kind="other">其他 <span class="count" data-count="other">0</span></button>
+    </nav>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+      <input type="text" id="filter-input" class="filter-input" placeholder="关键词筛选…" />
+      <select id="sort-select" class="sort-select">
+        <option value="time-desc">最新优先</option>
+        <option value="time-asc">最旧优先</option>
+        <option value="size-desc">大文件优先</option>
+        <option value="size-asc">小文件优先</option>
+      </select>
+    </div>
+
+    <div class="media-candidate-bar" id="media-candidate-bar" hidden>
+      <span class="media-candidate-text" id="media-candidate-text"></span>
+      <button type="button" class="media-candidate-toggle" id="media-candidate-toggle" hidden></button>
+    </div>
+
+    <!-- 批量操作栏 -->
+    <div class="batch-bar" id="batch-bar" hidden>
+      <span class="batch-count" id="batch-count">已选 0 项</span>
+      <label class="batch-select-all">
+        <input type="checkbox" id="select-all-checkbox" />
+        <span>全选</span>
+      </label>
+      <button class="batch-download-btn" id="batch-download-btn" disabled>批量下载</button>
+      <select id="comic-mode-select" class="comic-mode-select" title="漫画阅读成品格式">
+        <option value="cbz">CBZ</option>
+        <option value="folder">文件夹 + index</option>
+        <option value="both">两者都要</option>
+      </select>
+      <button class="batch-download-btn comic-package-btn" id="comic-package-btn" disabled>打包漫画</button>
+      <button type="button" class="batch-download-btn batch-cancel" id="batch-cancel">取消选择</button>
+    </div>
+
+    <!-- 资源列表 -->
+    <div class="list-container" id="list-container">
+      <!-- 空状态 -->
+      <div class="empty-state" id="empty-state">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" opacity="0.3">
+          <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+          <path d="M18 24h12M24 18v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <p>当前页面还没有可用资源</p>
+        <p class="hint">播放视频、滚动图片列表或刷新当前网页，WebGrab 会在这里归集可下载资源。</p>
+        <button type="button" id="empty-refresh" class="empty-refresh">重载页面并重新扫描</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- P4-1 文本按需提取视图 -->
+  <div class="view-pane view-text" id="view-text">
+    <div class="novel-container">
+      <section class="novel-card" id="novel-detection-card">
+        <div class="novel-kicker">按需提取</div>
+        <h2 id="novel-page-title">尚未检测当前页面</h2>
+        <p class="novel-muted" id="novel-detection-detail">切换到此页签后只做轻量检测，不会自动保存正文。</p>
+        <div class="novel-actions">
+          <button class="novel-btn novel-btn-primary" id="novel-extract-chapter" disabled>提取本章</button>
+          <button class="novel-btn" id="novel-prepare-full" disabled>提取全本</button>
+        </div>
+      </section>
+
+      <section class="novel-card novel-result" id="novel-single-result" hidden></section>
+
+      <section class="novel-card novel-export" id="novel-export-card" hidden>
+        <div class="novel-kicker">P4-2 可阅读成品</div>
+        <h2 id="novel-export-title">导出 EPUB 3</h2>
+        <p class="novel-muted">直接读取内部书库，不重新抓取网页。生成后可导入 Calibre、Apple Books 等阅读器。</p>
+        <button class="novel-btn novel-btn-primary" id="novel-export-epub">导出 EPUB</button>
+      </section>
+
+      <section class="novel-card novel-confirm" id="novel-confirm" hidden>
+        <h2>确认提取范围</h2>
+        <div id="novel-confirm-summary"></div>
+        <p class="novel-estimate" id="novel-estimate"></p>
+        <div class="novel-actions">
+          <button class="novel-btn novel-btn-primary" id="novel-confirm-start">确认开始</button>
+          <button class="novel-btn novel-btn-quiet" id="novel-confirm-cancel">取消</button>
+        </div>
+      </section>
+
+      <section class="novel-card novel-progress-card" id="novel-progress-card" hidden>
+        <div class="novel-progress-head">
+          <h2 id="novel-progress-title">正文提取任务</h2>
+          <span id="novel-progress-status" class="novel-status">准备中</span>
+        </div>
+        <p id="novel-current-chapter" class="novel-current">等待开始…</p>
+        <progress id="novel-progress" max="1" value="0"></progress>
+        <div class="novel-counts">
+          <span id="novel-progress-count">第 0/0 章</span>
+          <span id="novel-success-count">成功 0</span>
+          <span id="novel-failure-count">失败 0</span>
+        </div>
+        <div id="novel-failure-summary" class="novel-failures" hidden></div>
+        <button class="novel-btn novel-btn-danger" id="novel-cancel-task">取消提取</button>
+      </section>
+    </div>
+  </div>
+
+  <!-- B 站选择视图 -->
+  <div class="view-pane view-bilibili" id="view-bilibili">
+    <div class="bili-container" id="bili-container">
+      <!-- 动态填充 -->
+    </div>
+  </div>
+
+  <!-- 任务视图 -->
+  <div class="view-pane view-tasks" id="view-tasks"></div>
+
+  <!-- 底部状态栏 -->
+  <footer class="footer">
+    <span id="status-text">就绪</span>
+    <span id="source-stats" class="source-stats"></span>
+  </footer>
+
+  <script src="tasks.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

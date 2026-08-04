@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebGrab 资源面板</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header class="panel-rail">
+    <div class="panel-identity">
+      <span class="signal" aria-hidden="true"></span>
+      <span><strong>WEBGRAB</strong><small>RESOURCE DECK</small></span>
+    </div>
+    <button id="panel-close" type="button" aria-label="关闭 WebGrab 资源面板" title="关闭（Esc）">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>
+    </button>
+  </header>
+  <iframe id="popup-frame" src="popup.html?embedded=1" title="WebGrab 完整资源嗅探页面"></iframe>
+  <script src="panel.js"></script>
+</body>
+</html>

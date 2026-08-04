@@ -1,0 +1,6 @@
+{
+  "characters": [
+    { "id": "default", "name": "默认占位角色", "root": "assets/character" },
+    { "id": "detective-girl", "name": "蜜糖侦探", "root": "assets/character/detective-girl" }
+  ]
+}

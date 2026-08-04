@@ -1,0 +1,20 @@
+# 测试运行时产物（含体积较大的录制/合成视频）
+.test-output/
+
+# Python 测试脚本的缓存
+__pycache__/
+*.py[cod]
+
+# 测试过程中生成的截图快照
+tests/*.png
+
+# 依赖与构建产物
+node_modules/
+dist/
+*.zip
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,54 @@
+:root {
+  color-scheme: dark;
+  --canvas: #0b0d10;
+  --surface: #111419;
+  --raised: #181c22;
+  --line: #252b34;
+  --text: #e8eaed;
+  --muted: #a8b0bb;
+  --accent: #4da3ff;
+  --error: #f06f73;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --canvas: #f4f6f8;
+    --surface: #ffffff;
+    --raised: #edf0f3;
+    --line: #d2d8df;
+    --text: #171b21;
+    --muted: #566474;
+    --accent: #176fc8;
+    --error: #b72f38;
+  }
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --canvas: #f4f6f8;
+  --surface: #ffffff;
+  --raised: #edf0f3;
+  --line: #d2d8df;
+  --text: #171b21;
+  --muted: #566474;
+  --accent: #176fc8;
+  --error: #b72f38;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body { display: grid; grid-template-rows: 44px minmax(0, 1fr); background: var(--canvas); color: var(--text); font-family: var(--font); }
+.panel-rail { display: flex; align-items: center; justify-content: space-between; padding: 0 8px 0 12px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.panel-identity { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.panel-identity > span:last-child { display: flex; align-items: baseline; gap: 8px; }
+.panel-identity strong { font-size: 12px; letter-spacing: .12em; }
+.panel-identity small { color: var(--muted); font-size: 9px; letter-spacing: .1em; }
+.signal { width: 7px; height: 7px; border-radius: 999px; background: var(--accent); }
+#panel-close { width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border: 1px solid var(--line); border-radius: 4px; cursor: pointer; color: var(--muted); background: var(--raised); }
+#panel-close:hover { color: var(--error); border-color: var(--error); }
+#panel-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#panel-close path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+#popup-frame { width: 100%; height: 100%; min-height: 0; border: 0; background: var(--canvas); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }

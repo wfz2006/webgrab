@@ -1,0 +1,20 @@
+{
+  "appName": { "message": "WebGrab — Page Resource Sniffer & Downloader" },
+  "appDescription": { "message": "Sniffs downloadable media on the current page, with deep Bilibili support and on-demand novel text extraction." },
+  "actionTitle": { "message": "WebGrab" },
+  "contextMenuDownload": { "message": "Download with WebGrab" },
+  "onboardingTitle": { "message": "Welcome to WebGrab" },
+  "onboardingStep1Title": { "message": "1. Sniff resources" },
+  "onboardingStep1Body": { "message": "Open any page, play a video or scroll an image gallery — WebGrab automatically captures downloadable media in the background." },
+  "onboardingStep2Title": { "message": "2. Download" },
+  "onboardingStep2Body": { "message": "Click the toolbar icon to see the resource list. Download one at a time or select several, and pack comics into CBZ / novels into EPUB." },
+  "onboardingStep3Title": { "message": "3. Floating entry" },
+  "onboardingStep3Body": { "message": "When resources are found, a floating companion appears in the bottom-right corner — click it to open the resource panel without using the toolbar icon." },
+  "onboardingDismiss": { "message": "Got it, let's go" },
+  "settingsFilterTitle": { "message": "Resource filter rules" },
+  "settingsPackagePrefTitle": { "message": "Default package format" },
+  "settingsCharacterTitle": { "message": "Floating character" },
+  "settingsImportExportTitle": { "message": "Import / export settings" },
+  "settingsExportButton": { "message": "Export settings" },
+  "settingsImportButton": { "message": "Import settings" }
+}

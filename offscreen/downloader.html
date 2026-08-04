@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>WebGrab Downloader</title>
+</head>
+<body>
+  <!-- mp4box 作为非 ES module 通过 script 标签预加载，导出独立全局：window.MP4Box（含 createFile）、window.DataStream、window.ISOFile 等 -->
+  <script src="../lib/mp4box.all.min.js"></script>
+  <!-- P4-1：均为扩展包内本地代码；Readability 仅在显式小说任务中被调用。 -->
+  <script src="../lib/readability.js"></script>
+  <script src="../lib/novel-heuristics.js"></script>
+  <script src="../lib/novel-extractor.js"></script>
+  <script src="../lib/fflate.min.js"></script>
+  <script type="module" src="queue.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hostile CSS fixture</title>
+  <style>
+    * { box-sizing: content-box; }
+    button { all: unset !important; display: inline-block !important; color: rgb(255, 0, 0) !important; background: rgb(255, 0, 0) !important; font-size: 42px !important; }
+    iframe { border: 20px solid magenta !important; width: 260px; height: 120px; }
+    body { margin: 48px; font-family: serif; background: #f5eadc; }
+  </style>
+</head>
+<body>
+  <main id="host-layout">
+    <h1>宿主页敌对 CSS</h1>
+    <button id="fullscreen" type="button">进入全屏</button>
+    <img src="pixel.svg" alt="用于触发资源嗅探" width="180" height="120">
+    <iframe id="child" src="hostile-child.html" title="子框架"></iframe>
+  </main>
+  <script>
+    document.getElementById('fullscreen').addEventListener('click', () => document.documentElement.requestFullscreen());
+  </script>
+</body>
+</html>

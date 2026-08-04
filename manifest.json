@@ -1,0 +1,156 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_appName__",
+  "version": "0.1.0",
+  "description": "__MSG_appDescription__",
+  "minimum_chrome_version": "116",
+
+  "permissions": [
+    "webRequest",
+    "webNavigation",
+    "declarativeNetRequest",
+    "storage",
+    "tabs",
+    "offscreen",
+    "scripting",
+    "activeTab",
+    "downloads",
+    "sidePanel",
+    "contextMenus"
+  ],
+
+  "default_locale": "zh_CN",
+
+  "host_permissions": [
+    "<all_urls>"
+  ],
+
+  "background": {
+    "service_worker": "background/sw.js",
+    "type": "module"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["injected/hook.js"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": true
+    },
+    {
+      "matches": ["*://*.bilibili.com/*"],
+      "js": ["content/bilibili-probe.js"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": ["*://*.douyin.com/*"],
+      "js": ["content/douyin-probe.js"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/bridge.js"],
+      "run_at": "document_start",
+      "world": "ISOLATED",
+      "all_frames": true
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/scanner.js"],
+      "run_at": "document_idle",
+      "world": "ISOLATED",
+      "all_frames": true
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "lib/novel-heuristics.js",
+        "lib/novel-extractor.js",
+        "content/novel.js"
+      ],
+      "run_at": "document_idle",
+      "world": "ISOLATED",
+      "all_frames": false
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content/floating-companion.js"],
+      "run_at": "document_idle",
+      "world": "ISOLATED",
+      "all_frames": false
+    }
+  ],
+
+  "action": {
+    "default_popup": "ui/popup.html",
+    "default_title": "WebGrab"
+  },
+
+  "side_panel": {
+    "default_path": "ui/popup.html?embedded=1"
+  },
+
+  "options_ui": {
+    "page": "ui/options.html",
+    "open_in_tab": true
+  },
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["injected/hook.js"],
+      "matches": ["<all_urls>"]
+    },
+    {
+      "resources": [
+        "lib/ffmpeg/*",
+        "lib/mp4box.all.min.js",
+        "lib/m3u8-parser.min.js",
+        "lib/mpd-parser.min.js",
+        "offscreen/hls-parser.js",
+        "offscreen/dash-parser.js",
+        "offscreen/segment-fetcher.js",
+        "offscreen/remuxer.js",
+        "offscreen/ffmpeg-fallback.js"
+      ],
+      "matches": ["<all_urls>"]
+    },
+    {
+      "resources": [
+        "assets/character/*",
+        "ui/panel.html",
+        "ui/panel.css",
+        "ui/panel.js",
+        "ui/popup.html",
+        "ui/popup.css",
+        "ui/popup.js",
+        "ui/tasks.js",
+        "lib/character-manifest.js",
+        "lib/companion-position.js",
+        "lib/companion-settings.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
+  "cross_origin_embedder_policy": {
+    "value": "credentialless"
+  },
+  "cross_origin_opener_policy": {
+    "value": "same-origin"
+  },
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "蜜糖侦探",
+  "width": 120,
+  "height": 160,
+  "states": {
+    "idle":        { "sheet": "idle.webp",        "frames": 1, "fps": 1, "loop": true },
+    "scanning":    { "sheet": "scanning.webp",    "frames": 1, "fps": 1, "loop": true },
+    "found":       { "sheet": "found.webp",       "frames": 1, "fps": 1, "loop": false },
+    "downloading": { "sheet": "downloading.webp", "frames": 1, "fps": 1, "loop": true },
+    "done":        { "sheet": "done.webp",        "frames": 1, "fps": 1, "loop": false },
+    "error":       { "sheet": "error.webp",       "frames": 1, "fps": 1, "loop": false }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "默认占位角色",
+  "width": 120,
+  "height": 160,
+  "states": {
+    "idle": { "sheet": "idle.webp", "frames": 12, "fps": 8, "loop": true },
+    "scanning": { "sheet": "scan.webp", "frames": 8, "fps": 12, "loop": true },
+    "found": { "sheet": "found.webp", "frames": 6, "fps": 12, "loop": false },
+    "downloading": { "sheet": "down.webp", "frames": 10, "fps": 10, "loop": true },
+    "done": { "sheet": "done.webp", "frames": 8, "fps": 12, "loop": false },
+    "error": { "sheet": "error.webp", "frames": 6, "fps": 10, "loop": false }
+  }
+}

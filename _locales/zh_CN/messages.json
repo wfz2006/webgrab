@@ -1,0 +1,20 @@
+{
+  "appName": { "message": "WebGrab — 网页资源嗅探下载" },
+  "appDescription": { "message": "嗅探网页媒体资源并提供下载，支持哔哩哔哩深度适配与按需小说正文提取。" },
+  "actionTitle": { "message": "WebGrab" },
+  "contextMenuDownload": { "message": "用 WebGrab 下载" },
+  "onboardingTitle": { "message": "欢迎使用 WebGrab" },
+  "onboardingStep1Title": { "message": "1. 嗅探资源" },
+  "onboardingStep1Body": { "message": "打开任意网页，播放视频或滚动图片列表，WebGrab 会自动在后台捕获可下载的媒体资源。" },
+  "onboardingStep2Title": { "message": "2. 下载" },
+  "onboardingStep2Body": { "message": "点击工具栏图标查看资源列表，单个下载或多选批量下载，支持整理成漫画 CBZ / 小说 EPUB。" },
+  "onboardingStep3Title": { "message": "3. 悬浮入口" },
+  "onboardingStep3Body": { "message": "有资源时页面右下角会出现悬浮角色，点击可直接打开资源面板，无需先点工具栏图标。" },
+  "onboardingDismiss": { "message": "知道了，开始使用" },
+  "settingsFilterTitle": { "message": "资源过滤规则" },
+  "settingsPackagePrefTitle": { "message": "默认打包格式" },
+  "settingsCharacterTitle": { "message": "悬浮角色" },
+  "settingsImportExportTitle": { "message": "配置导入导出" },
+  "settingsExportButton": { "message": "导出配置" },
+  "settingsImportButton": { "message": "导入配置" }
+}

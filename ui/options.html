@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebGrab · 文件规整</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">WEBGRAB / STORAGE RULES</p>
+        <h1>让下载文件自己归位</h1>
+        <p class="lede">模板只决定下载目录内的相对路径。每一层都会经过 Windows 安全清洗，并在超长时优先缩短作品名和章节名。</p>
+      </div>
+      <div class="root-mark" aria-label="默认根目录"><span>DEFAULT ROOT</span><strong>WebGrab/</strong></div>
+    </header>
+
+    <form id="settings-form">
+      <section class="panel preview-panel">
+        <div class="panel-heading">
+          <div><span class="step">01</span><h2>实时路径预览</h2></div>
+          <label class="compact-field">预览类型
+            <select id="preview-type">
+              <option value="comic">漫画</option><option value="novel">小说</option>
+              <option value="video">视频</option><option value="audio">音频</option>
+              <option value="image">图片</option><option value="other">其他</option>
+            </select>
+          </label>
+        </div>
+        <output id="path-preview" class="path-preview">WebGrab/…</output>
+        <p id="preview-meta" class="preview-meta">正在读取当前资源…</p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading"><div><span class="step">02</span><h2>命名模板</h2></div><p>点击 token 可插入当前编辑框</p></div>
+        <div class="token-rail" aria-label="可用 token">
+          <button type="button" data-token="{root}">{root}</button><button type="button" data-token="{类型}">{类型}</button>
+          <button type="button" data-token="{站点}">{站点}</button><button type="button" data-token="{作品}">{作品}</button>
+          <button type="button" data-token="{章节}">{章节}</button><button type="button" data-token="{序号}">{序号}</button>
+          <button type="button" data-token="{标题}">{标题}</button><button type="button" data-token="{日期}">{日期}</button>
+          <button type="button" data-token="{ext}">{ext}</button>
+        </div>
+        <div class="template-grid">
+          <label><span>漫画</span><input data-template-type="comic" autocomplete="off"></label>
+          <label><span>小说</span><input data-template-type="novel" autocomplete="off"></label>
+          <label><span>视频</span><input data-template-type="video" autocomplete="off"></label>
+          <label><span>音频</span><input data-template-type="audio" autocomplete="off"></label>
+          <label><span>图片</span><input data-template-type="image" autocomplete="off"></label>
+          <label><span>其他</span><input data-template-type="other" autocomplete="off"></label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading"><div><span class="step">03</span><h2>同名文件策略</h2></div></div>
+        <div class="strategy-grid">
+          <label class="strategy-card"><input type="radio" name="conflict" value="uniquify"><span><strong>自动重命名</strong><small>默认。追加 (2)、(3)，保留两份文件。</small></span></label>
+          <label class="strategy-card"><input type="radio" name="conflict" value="skip"><span><strong>跳过已存在</strong><small>不改写同名文件；浏览器下载路径按可见下载历史预检。</small></span></label>
+          <label class="strategy-card"><input type="radio" name="conflict" value="overwrite"><span><strong>覆盖</strong><small>用新内容替换已有同名文件。</small></span></label>
+        </div>
+      </section>
+
+      <section class="panel companion-panel">
+        <div class="panel-heading">
+          <div><span class="step">04</span><h2>悬浮资源助手</h2></div>
+          <p>只有当前页已发现资源时才出现</p>
+        </div>
+        <div class="companion-settings">
+          <label class="switch-row" for="companion-enabled">
+            <span><strong>在网页上显示悬浮入口</strong><small>全局开关。关闭后所有站点立即隐藏，资源嗅探本身不受影响。</small></span>
+            <input id="companion-enabled" type="checkbox" role="switch">
+          </label>
+          <div class="hidden-sites-head">
+            <div><strong>已隐藏的站点</strong><small>在悬浮角色上点“在本站不显示”后会列在这里。</small></div>
+            <button type="button" id="companion-restore-sites" class="button secondary">恢复全部站点</button>
+          </div>
+          <div id="companion-hidden-sites" class="hidden-sites" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="panel appearance-panel">
+        <div class="panel-heading">
+          <div><span class="step">05</span><h2>界面外观</h2></div>
+          <p>Popup、悬浮面板和设置页共用</p>
+        </div>
+        <label class="appearance-setting" for="ui-theme">
+          <span><strong>颜色主题</strong><small>默认跟随系统，也可以固定为暗色或亮色。</small></span>
+          <select id="ui-theme">
+            <option value="system">跟随系统</option>
+            <option value="dark">暗色</option>
+            <option value="light">亮色</option>
+          </select>
+        </label>
+        <label class="appearance-setting" for="companion-character">
+          <span><strong>悬浮角色</strong><small>切换角色素材文件夹，立即在悬浮窗生效，无需重装扩展。</small></span>
+          <select id="companion-character"></select>
+        </label>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div><span class="step">06</span><h2>资源过滤规则</h2></div>
+          <p>命中任意一条即在嗅探阶段丢弃，不进入列表也不计入角标</p>
+        </div>
+        <div class="filter-grid">
+          <label class="filter-field"><span>扩展名黑名单</span>
+            <input id="filter-ext" type="text" autocomplete="off" placeholder="gif, ico（逗号分隔，不含点）">
+          </label>
+          <label class="filter-field"><span>MIME 黑名单</span>
+            <input id="filter-mime" type="text" autocomplete="off" placeholder="image/svg+xml（逗号分隔，支持前缀）">
+          </label>
+          <label class="filter-field"><span>图片最小体积</span>
+            <div class="filter-size-input"><input id="filter-min-image" type="number" min="0" step="1"><span>KB</span></div>
+          </label>
+          <label class="filter-field"><span>视频最小体积</span>
+            <div class="filter-size-input"><input id="filter-min-video" type="number" min="0" step="1"><span>KB</span></div>
+          </label>
+          <label class="filter-field"><span>音频最小体积</span>
+            <div class="filter-size-input"><input id="filter-min-audio" type="number" min="0" step="1"><span>KB</span></div>
+          </label>
+        </div>
+        <label class="filter-field filter-field-wide"><span>URL 正则黑名单</span>
+          <textarea id="filter-url-patterns" rows="3" placeholder="每行一条正则表达式，例如：&#10;/ads/&#10;\.thumb\.jpg$"></textarea>
+        </label>
+        <label class="switch-row" for="filter-hook-resources">
+          <span><strong>显示 Hook 层捕获的资源</strong><small>关闭后只保留网络层和 DOM 层发现的资源，Hook 层（MediaSource 探测）不再入库。</small></span>
+          <input id="filter-hook-resources" type="checkbox" role="switch">
+        </label>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div><span class="step">07</span><h2>下载性能</h2></div>
+          <p>影响单个视频/音频的分片抓取、批量下载与漫画打包并发，以及瞬时失败重试</p>
+        </div>
+        <div class="filter-grid">
+          <label class="filter-field"><span>分片并发数</span>
+            <input id="perf-segment-concurrency" type="number" min="1" max="8" step="1">
+          </label>
+          <label class="filter-field"><span>单文件重试次数</span>
+            <input id="perf-retry-count" type="number" min="0" max="5" step="1">
+          </label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div><span class="step">08</span><h2>默认打包格式</h2></div>
+          <p>批量打包漫画时的初始选中项，popup 里仍可临时改选</p>
+        </div>
+        <label class="appearance-setting" for="package-preference">
+          <span><strong>漫画成品格式</strong></span>
+          <select id="package-preference">
+            <option value="cbz">CBZ</option>
+            <option value="folder">文件夹 + index</option>
+            <option value="both">两者都要</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div><span class="step">09</span><h2>配置导入导出</h2></div>
+          <p>包含本页全部设置（不含已隐藏站点以外的悬浮窗位置记忆）</p>
+        </div>
+        <div class="import-export-row">
+          <button type="button" id="export-settings" class="button secondary">导出配置</button>
+          <button type="button" id="import-settings" class="button secondary">导入配置</button>
+          <input type="file" id="import-settings-file" accept="application/json" hidden>
+        </div>
+      </section>
+
+      <footer class="actions">
+        <p id="save-status" role="status" aria-live="polite"></p>
+        <button type="button" id="reset-settings" class="button secondary">恢复默认</button>
+        <button type="submit" class="button primary">保存设置</button>
+      </footer>
+    </form>
+  </main>
+  <script type="module" src="options.js"></script>
+</body>
+</html>
